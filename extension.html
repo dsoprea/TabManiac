@@ -1,0 +1,13 @@
+﻿<html>
+	<head>
+    <script type="text/javascript">
+document.write('<script src="' + chrome.extension.getURL('js/jquery-1.7.2.min.js') + '" type="text/javascript"></scr' + 'ipt>');
+document.write('<script src="' + chrome.extension.getURL('js/db.js') + '" type="text/javascript"></scr' + 'ipt>');
+document.write('<script src="' + chrome.extension.getURL('js/patches.js') + '" type="text/javascript"></scr' + 'ipt>');
+document.write('<script src="' + chrome.extension.getURL('js/ls.js') + '" type="text/javascript"></scr' + 'ipt>');
+document.write('<script src="' + chrome.extension.getURL('js/extension.js') + '" type="text/javascript"></scr' + 'ipt>');
+
+window.addEventListener('load', function() { Random.Extension.MainLoop(); }, false);
+    </script>
+	</head>
+</html>

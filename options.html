@@ -1,0 +1,40 @@
+<html>
+	<head>
+		<title>Tab Maniac Options</title>
+            <script type="text/javascript">
+                document.write('<script src="' + chrome.extension.getURL('js/jquery-1.7.2.min.js') + '" type="text/javascript"></scr' + 'ipt>');
+                document.write('<script src="' + chrome.extension.getURL('js/db.js') + '" type="text/javascript"></scr' + 'ipt>');
+                document.write('<script src="' + chrome.extension.getURL('js/patches.js') + '" type="text/javascript"></scr' + 'ipt>');
+                document.write('<script src="' + chrome.extension.getURL('js/ls.js') + '" type="text/javascript"></scr' + 'ipt>');
+                document.write('<script src="' + chrome.extension.getURL('js/extension.js') + '" type="text/javascript"></scr' + 'ipt>');
+                document.write('<script src="' + chrome.extension.getURL('js/options.js') + '" type="text/javascript"></scr' + 'ipt>');
+                document.write('<link href="' + chrome.extension.getURL('css/options.css') + '" type="text/css" rel="stylesheet"></li' + 'nk>');
+            </script>
+	</head>
+
+	<body>
+        <div class="standard-box title-box">
+            <div class="page-title">Tab Maniac</div>
+            <div class="credit">Dustin Oprea</div>
+        </div>
+        <div class="main">
+            <div class="standard-box history-box">
+                <div class="title">Current Backups</div>
+                <div class="list">
+                </div>
+            </div>
+            <div class="standard-box config-options">
+                <div class="title">Config</div>
+                <div class="status"></div>
+                <div class="options">
+                    <div class="options-row">
+                        <div class="description">Hours between saves (&lt;= 24)</div>
+                        <div class="field"><input id="period" value="" /></div>
+                        <div class="float-stop"></div>
+                    </div>
+                </div>
+                <button class="update-button" onclick="Random.Extension.Options.SaveOptions()">Update</button>
+            </div>
+        </div>
+	</body>
+</html>

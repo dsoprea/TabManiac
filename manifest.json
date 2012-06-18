@@ -1,0 +1,18 @@
+﻿{
+	"name": "Tab Maniac",
+	"version": "0.9.2",
+	"description": "Automatically back-up your Chrome tabs.",
+	"background_page": "extension.html",
+	"options_page": "options.html",
+    "minimum_chrome_version": "19",
+	"permissions": [
+		"tabs", 
+        "unlimitedStorage"
+	],
+	"icons": {
+		"32": "images/shield-32.png",
+		"48": "images/shield-48.png",
+		"64": "images/shield-64.png",
+		"128": "images/shield-128.png"
+	}
+}

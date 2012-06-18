@@ -1,0 +1,147 @@
+/*.content
+{
+    width: 300px;
+    height: 100%;
+
+    margin: 0px auto;
+    position: relative;
+}
+
+.main
+{
+    position: absolute;
+    top: 50%;
+
+    height: 200px;
+    margin-top: -100px;
+}
+*/
+
+body {
+}
+
+.title-box {
+    padding: 20px;
+    width: 400px;
+    margin: 40px auto 0px auto;
+}
+
+.title-box .page-title {
+    font-size: 1.6em;
+    font-weight: bold;
+    text-align: center;
+    font-family: arial black;
+}
+
+.title-box .credit {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.main {
+    padding: 20px;
+    width: 400px;
+    margin: 20px auto 0px auto;
+}
+
+.standard-box {
+    border: 1px solid gainsboro;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 5px;
+}
+
+.standard-box .title {
+    font-size: 1.2em;
+    font-weight: bold;
+    text-align: center;
+}
+
+.round-borders,.standard-box {
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+}
+
+.main .history-box {
+    display: none;
+    width: 371px;
+}
+
+.main .history-box .history-item {
+}
+
+.history-box .list {
+    margin-top: 20px;
+}
+
+.history-box .list .history-item .time-string {
+    float: left;
+    font-weight: bold;
+    width: 130px;
+    text-align: center;
+}
+
+.history-box .list .history-item .stats {
+    float: left;
+    width: 150px;
+}
+
+.history-box .list .history-item .delete-button {
+    float: left;
+    width: 40px;
+    margin-left: 8px;
+}
+
+.history-box .list .history-item .open-button {
+    float: left;
+    width: 35px;
+}
+
+.float-stop {
+    clear: both;
+}
+
+.config-options {
+    width: 325px;
+    margin-top: 20px;
+    text-align: center;
+}
+
+.config-options .options {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.config-options .update-button {
+    padding: 4px 8px;
+}
+
+.config-options .status {
+    display: none;
+    margin-top: 10px;
+    color: blue;
+    font-weight: bold;
+}
+
+.config-options .options .options-row {
+    width: 305px;
+    margin: 0 auto;
+}
+
+.config-options .options .options-row .description {
+    float: left;
+    text-align: right;
+    width: 210px;
+}
+
+.config-options .options .options-row .field {
+    float: left;
+    text-align: left;
+    margin-left: 10px;
+    width: 85px;
+}
+
+.config-options .options .options-row .field input {
+    width: 80px;
+}
