@@ -82,7 +82,7 @@ Random.Extension.GetTimestampString = function(options)
             string = (String(yyyy) + "-" + prepare(mm) + "-" + prepare(dd));
             
         else
-            string = (String(yyyy) + "-" + prepare(mm) + "-" + prepare(dd) + " " + prepare(hh) + ":" + prepare(min));
+            string = (String(yyyy) + "-" + prepare(mm) + "-" + prepare(dd) + " " + prepare(hh));// + ":" + prepare(min));
     }
     
     else
