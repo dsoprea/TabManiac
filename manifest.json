@@ -1,7 +1,7 @@
 ﻿{
 	"name": "Tab Maniac",
 	"version": "0.9.3",
-	"description": "Automatically back-up your Chrome tabs.",
+	"description": "Automatically backup your Chrome tabs.",
 	"background_page": "extension.html",
 	"options_page": "options.html",
     "minimum_chrome_version": "19",
