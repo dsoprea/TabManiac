@@ -66,7 +66,7 @@ body {
 
 .main .history-box {
     display: none;
-    width: 371px;
+    width: 391px;
 }
 
 .main .history-box .history-item {
@@ -85,7 +85,7 @@ body {
 
 .history-box .list .history-item .stats {
     float: left;
-    width: 150px;
+    width: 170px;
 }
 
 .history-box .list .history-item .delete-button {

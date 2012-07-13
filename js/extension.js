@@ -224,19 +224,20 @@ Random.Extension.CheckForBackup = function(options)
                         }
                 }
                 
-                var ptr = 0;
+                if(count > 0)
+                    return;
                 
-                function ClipOldRecords()
+                InsertNewInternal();
+
+                var ptr = 0;
+                function ClipOldRecords(totalList, totalCount)
                 {
-                    if(count < Random.Extension.Data.MaxRecords)
-                    {
-                        InsertNewInternal();
+                    if(totalCount <= Random.Extension.Data.MaxRecords)
                         return;
-                    }
                 
                     var key = list[ptr];
                     ptr++;
-                    count--;
+                    totalCount--;
                     
                     Random.Extension.LogInfo("Delete old tabs record with ID [" + key + "].");
                     
@@ -251,7 +252,7 @@ Random.Extension.CheckForBackup = function(options)
                         }
                 }
                 
-                ClipOldRecords();
+                Random.Extension.GetAllBackups({ Success: ClipOldRecords });
             }
             
             Random.Extension.GetObjectTabData({ Success: DataAggregatedInternal });
