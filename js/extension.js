@@ -192,11 +192,11 @@ Random.Extension.CheckForBackup = function(options)
             {
                 Random.Extension.LogInfo("Writing tabs for [" + timestampString + "].");
 
-                var transaction = db.transaction([RANDOM_EXT_TABLE_TABS], IDBTransaction.READ_WRITE)
-                var store = transaction.objectStore(RANDOM_EXT_TABLE_TABS);
-
                 function InsertNewInternal()
                 {
+                    var transaction = db.transaction([RANDOM_EXT_TABLE_TABS], IDBTransaction.READ_WRITE)
+                    var store = transaction.objectStore(RANDOM_EXT_TABLE_TABS);
+
                     try
                     {
                         var data = {
@@ -232,10 +232,19 @@ Random.Extension.CheckForBackup = function(options)
                 var ptr = 0;
                 function ClipOldRecords(totalList, totalCount)
                 {
+                    var transaction = db.transaction([RANDOM_EXT_TABLE_TABS], IDBTransaction.READ_WRITE)
+                    var store = transaction.objectStore(RANDOM_EXT_TABLE_TABS);
+
                     if(totalCount <= Random.Extension.Data.MaxRecords)
                         return;
                 
-                    var key = list[ptr];
+                    var key;
+                    for(var it in totalList)
+                    {
+                        key = it;
+                        break;
+                    }
+                    
                     ptr++;
                     totalCount--;
                     
@@ -247,8 +256,8 @@ Random.Extension.CheckForBackup = function(options)
                             Random.Extension.ThrowError("Could not delete old tabs record with key [" + key + "] in position (" + ptr + "): " + ev.target.errorCode);
                         }
 
-                    request.onsuccess = function(ev) {
-                            ClipOldRecords();
+                    request.onsuccess = function() {
+                            ClipOldRecords(totalList, totalCount);
                         }
                 }
                 
