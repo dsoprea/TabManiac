@@ -7,7 +7,7 @@ if(typeof(Random.Extension) == "undefined")
     
 Random.Extension.Data = { 
         AppName:                        "Tab Maniac",
-        DefaultCheckFrequencySeconds:   3600,
+        DefaultCheckFrequencySeconds:   1800,
         PeriodHours:                    6,
         DbVersion:                      1,
         DbName:                         "TabVault",
@@ -194,7 +194,7 @@ Random.Extension.CheckForBackup = function(options)
 
                 function InsertNewInternal()
                 {
-                    var transaction = db.transaction([RANDOM_EXT_TABLE_TABS], IDBTransaction.READ_WRITE)
+                    var transaction = db.transaction([RANDOM_EXT_TABLE_TABS], "readwrite")
                     var store = transaction.objectStore(RANDOM_EXT_TABLE_TABS);
 
                     try
@@ -225,43 +225,12 @@ Random.Extension.CheckForBackup = function(options)
                 }
                 
                 if(count > 0)
-                    return;
-                
-                InsertNewInternal();
-
-                var ptr = 0;
-                function ClipOldRecords(totalList, totalCount)
                 {
-                    var transaction = db.transaction([RANDOM_EXT_TABLE_TABS], IDBTransaction.READ_WRITE)
-                    var store = transaction.objectStore(RANDOM_EXT_TABLE_TABS);
-
-                    if(totalCount <= Random.Extension.Data.MaxRecords)
-                        return;
-                
-                    var key;
-                    for(var it in totalList)
-                    {
-                        key = it;
-                        break;
-                    }
-                    
-                    ptr++;
-                    totalCount--;
-                    
-                    Random.Extension.LogInfo("Delete old tabs record with ID [" + key + "].");
-                    
-                    var request = store.delete(key);
-                    
-                    request.onerror = function(ev) {
-                            Random.Extension.ThrowError("Could not delete old tabs record with key [" + key + "] in position (" + ptr + "): " + ev.target.errorCode);
-                        }
-
-                    request.onsuccess = function() {
-                            ClipOldRecords(totalList, totalCount);
-                        }
+                    success(false);
+                    return;
                 }
                 
-                Random.Extension.GetAllBackups({ Success: ClipOldRecords });
+                InsertNewInternal();
             }
             
             Random.Extension.GetObjectTabData({ Success: DataAggregatedInternal });
@@ -290,7 +259,7 @@ Random.Extension.GetAllBackups = function(options)
 
     function DbAcquiredInternal(db)
     {
-        var transaction = db.transaction([RANDOM_EXT_TABLE_TABS], IDBTransaction.READ_ONLY)
+        var transaction = db.transaction([RANDOM_EXT_TABLE_TABS], "readonly")
         var store = transaction.objectStore(RANDOM_EXT_TABLE_TABS);
 
         function RecordsRetrievedInternal(list, count)
@@ -309,11 +278,65 @@ Random.Extension.GetAllBackups = function(options)
     Random.Extension.Indexed.GetDb({ Success: DbAcquiredInternal });
 }
 
+Random.Extension.DbAcquiredForClipInternal = function(db, success)
+{
+    var ptr = 0;
+    var removed = 0;
+    function ClipOldRecords(totalList, totalCount)
+    {
+        var transaction = db.transaction([RANDOM_EXT_TABLE_TABS], "readwrite")
+        var store = transaction.objectStore(RANDOM_EXT_TABLE_TABS);
+
+        if(totalCount <= Random.Extension.Data.MaxRecords)
+        {
+            if(removed > 0)
+                console.log("(" + removed + ") old tabs records removed.");
+
+            success(removed);
+            return;
+        }
+
+        var key;
+        for(var it in totalList)
+        {
+            key = it;
+            break;
+        }
+    
+        ptr++;
+        totalCount--;
+    
+        Random.Extension.LogInfo("Delete old tabs record with ID [" + key + "].");
+    
+        var request = store.delete(key);
+
+        request.onerror = function(ev) {
+                Random.Extension.ThrowError("Could not delete old tabs record with key [" + key + "] in position (" + ptr + "): " + ev.target.errorCode);
+            }
+
+        request.onsuccess = function() {
+                delete totalList[key];
+                removed++;
+                ClipOldRecords(totalList, totalCount);
+            }
+    }
+
+    Random.Extension.GetAllBackups({ Success: ClipOldRecords });
+}
+
 Random.Extension.MainLoop = function()
 {
     function CheckCompleteInternal()
     {
-        setTimeout(Random.Extension.MainLoop, Random.Extension.Data.DefaultCheckFrequencySeconds * 1000);
+        function ScheduleNext()
+        {
+            setTimeout(Random.Extension.MainLoop, Random.Extension.Data.DefaultCheckFrequencySeconds * 1000);
+        }
+    
+        // Check if we need to clean-up any records.
+        Random.Extension.Indexed.GetDb({ Success: function(db) { 
+                Random.Extension.DbAcquiredForClipInternal(db, ScheduleNext); 
+            }});
     }
     
     Random.Extension.CheckForBackup({ Success: CheckCompleteInternal });

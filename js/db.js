@@ -207,7 +207,7 @@ Random.Extension.Indexed = {
                 var lowerBound  = options.LowerBound;
                 var upperBound  = options.UpperBound;
 
-                var transaction = db.transaction([storeName], IDBTransaction.READ_ONLY)
+                var transaction = db.transaction([storeName], "readonly")
                 var store = transaction.objectStore(storeName);
                 
                 var keyRange;
