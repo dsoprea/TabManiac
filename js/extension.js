@@ -341,3 +341,5 @@ Random.Extension.MainLoop = function()
     
     Random.Extension.CheckForBackup({ Success: CheckCompleteInternal });
 }
+
+window.addEventListener('load', function() { Random.Extension.MainLoop(); }, false);

@@ -4,7 +4,13 @@
 	"version": "0.9.6",
 	"description": "Automatically backup your Chrome tabs.",
 	"background": {
-            "page": "extension.html"
+            "scripts": [
+                    "js/jquery-1.7.2.min.js",
+                    "js/db.js",
+                    "js/patches.js",
+                    "js/ls.js",
+                    "js/extension.js"
+                ]
         },
 	"options_page": "options.html",
     "minimum_chrome_version": "19",
