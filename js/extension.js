@@ -194,7 +194,7 @@ Random.Extension.CheckForBackup = function(options)
 
                 function InsertNewInternal()
                 {
-                    var transaction = db.transaction([RANDOM_EXT_TABLE_TABS], "readwrite")
+                    var transaction = db.transaction([RANDOM_EXT_TABLE_TABS], IDBTransaction.READ_WRITE)
                     var store = transaction.objectStore(RANDOM_EXT_TABLE_TABS);
 
                     try
@@ -223,13 +223,7 @@ Random.Extension.CheckForBackup = function(options)
                             success(false);
                         }
                 }
-                
-                if(count > 0)
-                {
-                    success(false);
-                    return;
-                }
-                
+
                 InsertNewInternal();
             }
             
@@ -284,7 +278,7 @@ Random.Extension.DbAcquiredForClipInternal = function(db, success)
     var removed = 0;
     function ClipOldRecords(totalList, totalCount)
     {
-        var transaction = db.transaction([RANDOM_EXT_TABLE_TABS], "readwrite")
+        var transaction = db.transaction([RANDOM_EXT_TABLE_TABS], IDBTransaction.READ_WRITE)
         var store = transaction.objectStore(RANDOM_EXT_TABLE_TABS);
 
         if(totalCount <= Random.Extension.Data.MaxRecords)
