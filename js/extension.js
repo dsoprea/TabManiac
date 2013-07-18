@@ -9,7 +9,7 @@ Random.Extension.Data = {
         AppName:                        "Tab Maniac",
         DefaultCheckFrequencySeconds:   1800,
         PeriodHours:                    6,
-        DbVersion:                      1,
+        DbVersion:                      2,
         DbName:                         "TabVault",
         MaxRecords:                     20
     }

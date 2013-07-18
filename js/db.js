@@ -23,7 +23,6 @@ Random.Extension.Indexed = {
                 
                 Random.Extension.Indexed.GetDb({ Success: options.Success });
             },
-
         UpdateDb: function(options) {
                 // Arguments:
                 //
@@ -70,26 +69,37 @@ Random.Extension.Indexed = {
                 //
 
                 var success = options.Success;
-                
+
                 if(typeof(Random.Extension.Data.Db) == "undefined")
                 {
-                    function CheckVersionInternal(db, currentVersion, updateType, successInternal)
+                    function CheckVersionInternal(db, newVersion, updateType, successInternal)
                     {
                         if(typeof(successInternal) == "undefined")
                             successInternal = function() { }
-                    
-                        if(currentVersion == "")
-                            currentVersion = 0;
 
-                        if(currentVersion == Random.Extension.Data.DbVersion)
+                        if(db.objectStoreNames.contains(RANDOM_EXT_TABLE_TABS) 
+                            == false)
+                            db.createObjectStore(RANDOM_EXT_TABLE_TABS, 
+                                                 {keyPath: RANDOM_EXT_PK_TABS})
+                
+
+                        if(newVersion == "")
+                            newVersion = 0;
+
+                        if(newVersion == Random.Extension.Data.DbVersion)
                         {
                             // Initial configuration.
 
-                            db.createObjectStore(RANDOM_EXT_TABLE_TABS, 
-                                                 {keyPath: RANDOM_EXT_PK_TABS})
+                            // We don't do anything, since we already verified 
+                            // the store, above.
 
                             successInternal(db);
                         }
+                        else
+                        {
+                        
+                        }
+/*
                         else
                         {
                             // Version update.
@@ -107,6 +117,7 @@ Random.Extension.Indexed = {
                                     Success:        UpdateCompleteInternal
                                 });
                         }
+*/
                     }
 
                     var request = indexedDB.open(Random.Extension.Data.DbName, 
@@ -131,7 +142,7 @@ Random.Extension.Indexed = {
 
                         // Using "setVersion" is, apparently, the obsolete way 
                         // to do updates.
-                        var currentVersion = Random.Extension.Data.Db.version;
+                        var currentVersion = Random.Extension.Data.DbVersion;
                         
                         if(currentVersion != Random.Extension.Data.DbVersion && typeof(Random.Extension.Data.Db.setVersion) != "undefined")
                         {

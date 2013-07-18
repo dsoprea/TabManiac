@@ -1,6 +1,10 @@
 {
    "background": {
-      "scripts": [ "js/jquery-1.7.2.min.js", "js/db.js", "js/patches.js", "js/ls.js", "js/extension.js" ]
+      "scripts": [ "js/jquery-1.7.2.min.js", 
+                   "js/db.js", 
+                   "js/patches.js", 
+                   "js/ls.js", 
+                   "js/extension.js" ]
    },
    "description": "Automatically backup your Chrome tabs.",
    "icons": {
@@ -9,12 +13,11 @@
       "48": "images/shield-48.png",
       "64": "images/shield-64.png"
    },
-   "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCih2CPPelXmJ3qp7ROPEQax0GI8ESc3llbsykxmgD3VljWdxQAZ+8QyATqDNblSDNW0ri3wdDRFBhLLTNkiefX97oqeqnphBdon98+CnTmVwhj2t0gHWyAbBukKwyVNvvQD+Yk7P/WRj1PKHU3G/jLbonHohEl7vmi2f1V4u7ZOwIDAQAB",
    "manifest_version": 2,
    "minimum_chrome_version": "19",
    "name": "Tab Maniac",
    "options_page": "options.html",
    "permissions": [ "tabs", "unlimitedStorage" ],
    "update_url": "http://clients2.google.com/service/update2/crx",
-   "version": "0.9.8"
+   "version": "0.9.10"
 }
