@@ -27,14 +27,6 @@ Random.Extension.GetPeriod = function()
     return period;
 }
 
-Random.Extension.ThrowError = function(message, data)
-{
-    console.error(Random.Extension.Data.AppName + " had a critical error: " + message, data);
-    
-    // Stop execution.
-    throw data;
-}
-
 Random.Extension.LogInfo = function(message, data)
 {
     if(typeof(console) != "undefined" && typeof(console.log) != "undefined")
@@ -194,7 +186,7 @@ Random.Extension.CheckForBackup = function(options)
 
                 function InsertNewInternal()
                 {
-                    var transaction = db.transaction([RANDOM_EXT_TABLE_TABS], IDBTransaction.READ_WRITE)
+                    var transaction = db.transaction(RANDOM_EXT_TABLE_TABS, 'readwrite')
                     var store = transaction.objectStore(RANDOM_EXT_TABLE_TABS);
 
                     try
@@ -211,12 +203,11 @@ Random.Extension.CheckForBackup = function(options)
                     
                     catch(e)
                     {
-                        Random.Extension.ThrowError("Exception for write of new entry.", e);
-                        return;
+                        throw ("Exception for write of new entry: " + e);
                     }
                     
                     request.onerror = function(ev) {
-                            Random.Extension.ThrowError("Could not write new entry: " + ev.target.errorCode);
+                            throw ("Could not write new entry: " + ev.target.errorCode);
                         }
 
                     request.onsuccess = function(ev) {
@@ -253,7 +244,7 @@ Random.Extension.GetAllBackups = function(options)
 
     function DbAcquiredInternal(db)
     {
-        var transaction = db.transaction([RANDOM_EXT_TABLE_TABS], "readonly")
+        var transaction = db.transaction(RANDOM_EXT_TABLE_TABS, "readonly")
         var store = transaction.objectStore(RANDOM_EXT_TABLE_TABS);
 
         function RecordsRetrievedInternal(list, count)
@@ -278,7 +269,7 @@ Random.Extension.DbAcquiredForClipInternal = function(db, success)
     var removed = 0;
     function ClipOldRecords(totalList, totalCount)
     {
-        var transaction = db.transaction([RANDOM_EXT_TABLE_TABS], IDBTransaction.READ_WRITE)
+        var transaction = db.transaction(RANDOM_EXT_TABLE_TABS, 'readwrite')
         var store = transaction.objectStore(RANDOM_EXT_TABLE_TABS);
 
         if(totalCount <= Random.Extension.Data.MaxRecords)
@@ -305,7 +296,7 @@ Random.Extension.DbAcquiredForClipInternal = function(db, success)
         var request = store.delete(key);
 
         request.onerror = function(ev) {
-                Random.Extension.ThrowError("Could not delete old tabs record with key [" + key + "] in position (" + ptr + "): " + ev.target.errorCode);
+                throw ("Could not delete old tabs record with key [" + key + "] in position (" + ptr + "): " + ev.target.errorCode);
             }
 
         request.onsuccess = function() {

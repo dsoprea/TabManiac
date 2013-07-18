@@ -8,20 +8,6 @@ if(typeof(Random.Extension) == "undefined")
 var RANDOM_EXT_TABLE_TABS = "tabs";
 var RANDOM_EXT_PK_TABS = "Timestamp";
 
-if(window.mozIndexedDB) 
-{
-    window.indexedDB        = window.mozIndexedDB;
-    window.IDBKeyRange      = window.IDBKeyRange;
-    window.IDBTransaction   = window.IDBTransaction;
-}
-
-if(window.webkitIndexedDB)
-{
-    window.indexedDB        = window.webkitIndexedDB;
-    window.IDBKeyRange      = window.webkitIDBKeyRange;
-    window.IDBTransaction   = window.webkitIDBTransaction;
-}
-
 Random.Extension.Indexed = {
         SetDbVersion: function(options) {
                 // Arguments:
@@ -87,10 +73,6 @@ Random.Extension.Indexed = {
                 
                 if(typeof(Random.Extension.Data.Db) == "undefined")
                 {
-                    var indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB; 
-
-                    var request = indexedDB.open(Random.Extension.Data.DbName, Random.Extension.Data.DbVersion);
-                    
                     function CheckVersionInternal(db, currentVersion, updateType, successInternal)
                     {
                         if(typeof(successInternal) == "undefined")
@@ -99,8 +81,19 @@ Random.Extension.Indexed = {
                         if(currentVersion == "")
                             currentVersion = 0;
 
-                        if(currentVersion != Random.Extension.Data.DbVersion)
+                        if(currentVersion == Random.Extension.Data.DbVersion)
                         {
+                            // Initial configuration.
+
+                            db.createObjectStore(RANDOM_EXT_TABLE_TABS, 
+                                                 {keyPath: RANDOM_EXT_PK_TABS})
+
+                            successInternal(db);
+                        }
+                        else
+                        {
+                            // Version update.
+                        
                             Random.Extension.LogInfo("Doing database update.  TYPE= [" + updateType + "]");
                         
                             function UpdateCompleteInternal(oldVersion, newVersion)
@@ -114,10 +107,10 @@ Random.Extension.Indexed = {
                                     Success:        UpdateCompleteInternal
                                 });
                         }
-                        
-                        else
-                            successInternal(db);
                     }
+
+                    var request = indexedDB.open(Random.Extension.Data.DbName, 
+                                                 Random.Extension.Data.DbVersion);
 
                     // This is, apparently, the new way to perform updates.
                     // We expect that this is not run simultaneously with the 
@@ -130,7 +123,7 @@ Random.Extension.Indexed = {
                         }
 
                     request.onerror = function(ev) {
-                        Random.Extension.ThrowError("Database-open error: " + ev.target.errorCode);
+                        throw ("Database-open error: " + ev.target.errorCode);
                     }
                     
                     request.onsuccess = function(ev) {
@@ -145,7 +138,7 @@ Random.Extension.Indexed = {
                             var setVrequest = Random.Extension.Data.Db.setVersion(Random.Extension.Data.DbVersion);
 
                             setVrequest.onfailure = function(ev) {
-                                    Random.Extension.ThrowError("Patch failure: " + ev.target.errorCode);
+                                    throw ("Patch failure: " + ev.target.errorCode);
                                 }
                                 
                             setVrequest.onsuccess = function(ev) {
@@ -207,62 +200,76 @@ Random.Extension.Indexed = {
                 var lowerBound  = options.LowerBound;
                 var upperBound  = options.UpperBound;
 
-                var transaction = db.transaction([storeName], "readonly")
-                var store = transaction.objectStore(storeName);
-                
-                var keyRange;
-                if(typeof(only) != "undefined")
-                    keyRange = IDBKeyRange.only(only);
-                
-                else if(typeof(lowerBound) != "undefined" && typeof(upperBound) != "undefined")
-                    keyRange = IDBKeyRange.bound(lowerBound, upperBound);
-                    
-                else if(typeof(lowerBound) != "undefined")
-                    keyRange = IDBKeyRange.lowerBound(lowerBound);
-                
-                else if(typeof(upperBound) != "undefined")
-                    keyRange = IDBKeyRange.upperBound(upperBound);
-                
-                else
-                    keyRange = IDBKeyRange.lowerBound(0);
-                
-                var cursorRequest = store.openCursor(keyRange);
-        
-                cursorRequest.onerror = function(ev) {
-                        Random.Extension.ThrowError("Could not read for entries in [" + storeName + "]: " + ev.target.errorCode);
-                    }
-
-                var keyPath = store.keyPath;
-                    
-                var list;
-                if(getValues) 
-                    list = { }
-                    
-                else
-                    list = []
-
+                var transaction = null;
+                var list = {};
                 var count = 0;
-                cursorRequest.onsuccess = function(ev) {
-                        var result = ev.target.result;
+
+                try
+                {
+                    transaction = db.transaction(storeName, "readonly")
+                }
+                catch(e)
+                { 
+                    success(list, count);
+                    return;
+                }
+
+                if(transaction)
+                {
+                    var store = transaction.objectStore(storeName);
+                    
+                    var keyRange;
+                    if(typeof(only) != "undefined")
+                        keyRange = IDBKeyRange.only(only);
+                    
+                    else if(typeof(lowerBound) != "undefined" && typeof(upperBound) != "undefined")
+                        keyRange = IDBKeyRange.bound(lowerBound, upperBound);
+                        
+                    else if(typeof(lowerBound) != "undefined")
+                        keyRange = IDBKeyRange.lowerBound(lowerBound);
+                    
+                    else if(typeof(upperBound) != "undefined")
+                        keyRange = IDBKeyRange.upperBound(upperBound);
+                    
+                    else
+                        keyRange = IDBKeyRange.lowerBound(0);
+                    
+                    var cursorRequest = store.openCursor(keyRange);
             
-                        if(!!result == false)
-                        {
-                            success(list, count);
-                            return;
+                    cursorRequest.onerror = function(ev) {
+                            throw ("Could not read for entries in [" + storeName + "]: " + ev.target.errorCode);
                         }
 
-                        var key = result.value[keyPath];
+                    var keyPath = store.keyPath;
                         
-                        if(getValues)
-                            list[key] = result.value;
+                    if(getValues) 
+                        list = { }
                         
-                        else
-                            list[list.length] = key;
+                    else
+                        list = []
 
-                        count++;
+                    cursorRequest.onsuccess = function(ev) {
+                            var result = ev.target.result;
+                
+                            if(!!result == false)
+                            {
+                                success(list, count);
+                                return;
+                            }
+
+                            var key = result.value[keyPath];
                             
-                        result.continue();
-                    }
+                            if(getValues)
+                                list[key] = result.value;
+                            
+                            else
+                                list[list.length] = key;
+
+                            count++;
+                                
+                            result.continue();
+                        }
+                }
             },
         
         GetStore: function(options) {
@@ -295,7 +302,7 @@ Random.Extension.Indexed = {
                 {
                     function RecordsRetrievedInternal(list, count)
                     {
-                        var transaction = db.transaction([storeName], IDBTransaction.READ_WRITE)
+                        var transaction = db.transaction(storeName, 'readwrite')
                         var store = transaction.objectStore(storeName);
 
                         var i = 0;
@@ -313,7 +320,7 @@ Random.Extension.Indexed = {
                             var request = store.delete(key);
                             
                             request.onerror = function(ev) {
-                                    Random.Extension.ThrowError("Could not delete record with key [" + key + "] from store with name [" + storeName + "]: " + ev.target.errorCode);
+                                    throw ("Could not delete record with key [" + key + "] from store with name [" + storeName + "]: " + ev.target.errorCode);
                                 }
 
                             request.onsuccess = function(ev) {
@@ -350,14 +357,14 @@ Random.Extension.Indexed = {
                 var request = store.delete(key);
                 
                 request.onerror = function(ev) {
-                        Random.Extension.ThrowError("Could not delete record with key [" + key + "] from store with name [" + storeName + "]: " + ev.target.errorCode);
+                        throw ("Could not delete record with key [" + key + "] from store with name [" + storeName + "]: " + ev.target.errorCode);
                     }
 
                 request.onsuccess = function(ev) {
                         success(request);
                     }
             },
-        
+
         AddToStore: function(options) {
                 // Arguments:
                 // 
@@ -377,12 +384,12 @@ Random.Extension.Indexed = {
                 
                 catch(e)
                 {
-                    Random.Extension.ThrowError("Exception for write of entry.", e);
+                    throw ("Exception for write of entry.", e);
                     return;
                 }
                 
                 request.onerror = function(ev) {
-                        Random.Extension.ThrowError("Could not write entry: " + ev.target.errorCode);
+                        throw ("Could not write entry: " + ev.target.errorCode);
                     }
 
                 request.onsuccess = function(ev) {

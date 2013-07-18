@@ -66,7 +66,7 @@ Random.Extension.Options.Boot = function()
                 {
                     function RecordsRetrievedInternal(list, count)
                     {
-                        var transaction = db.transaction([RANDOM_EXT_TABLE_TABS], IDBTransaction.READ_WRITE)
+                        var transaction = db.transaction([RANDOM_EXT_TABLE_TABS], 'readwrite')
                         var store = transaction.objectStore(RANDOM_EXT_TABLE_TABS);
 
                         var request = store.delete(timestampString);
